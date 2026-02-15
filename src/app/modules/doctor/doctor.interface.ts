@@ -3,5 +3,6 @@ export interface IUpdateDoctorPayload {
 	profilePhoto?: string;
 	contactNumber?: string;
 	address?: string;
-	experience?: string;
+	appointmentFee?: number;
+	experience?: number;
 }
