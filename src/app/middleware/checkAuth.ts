@@ -11,6 +11,7 @@ import { jwtUtils } from "../utils/jwt";
 export const checkAuth = (...authRoles: UserRole[]) => {
 	return async (req: Request, res: Response, next: NextFunction) => {
 		try {
+			// Session Token Verification
 			const sessionToken = CookieUtils.getCookie(req, "better-auth.session_token");
 
 			if (!sessionToken) {
@@ -73,6 +74,7 @@ export const checkAuth = (...authRoles: UserRole[]) => {
 				}
 			}
 
+			// Access Token Verification
 			const accessToken = CookieUtils.getCookie(req, "accessToken");
 
 			if (!accessToken) {
