@@ -4,6 +4,9 @@ import { envVars } from "../../config/env";
 import { CookieUtils } from "./cookie";
 import { jwtUtils } from "./jwt";
 
+export const ONE_DAY = 24 * 60 * 60 * 1000; // 1d in ms
+const SEVEN_DAYS = ONE_DAY * 7;
+
 const getAccessToken = (payload: JwtPayload) => {
 	const accessToken = jwtUtils.createToken(payload, envVars.ACCESS_TOKEN_SECRET, {
 		expiresIn: envVars.ACCESS_TOKEN_EXPIRES_IN,
@@ -19,9 +22,6 @@ const getRefreshToken = (payload: JwtPayload) => {
 
 	return refreshToken;
 };
-
-const ONE_DAY = 24 * 60 * 60 * 1000; // 1d in ms
-const SEVEN_DAYS = ONE_DAY * 7;
 
 const setAccessTokenCookie = (res: Response, token: string) => {
 	CookieUtils.setCookie(res, "accessToken", token, {
