@@ -4,8 +4,8 @@ import { envVars } from "../../config/env";
 import { CookieUtils } from "./cookie";
 import { jwtUtils } from "./jwt";
 
-export const ONE_DAY = 24 * 60 * 60 * 1000; // 1d in ms
-const SEVEN_DAYS = ONE_DAY * 7;
+const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000; // 1d in ms
+const SEVEN_DAYS_IN_MS = ONE_DAY_IN_MS * 7;
 
 const getAccessToken = (payload: JwtPayload) => {
 	const accessToken = jwtUtils.createToken(payload, envVars.ACCESS_TOKEN_SECRET, {
@@ -30,7 +30,7 @@ const setAccessTokenCookie = (res: Response, token: string) => {
 		sameSite: "none",
 		path: "/",
 		// 1 day
-		maxAge: ONE_DAY,
+		maxAge: ONE_DAY_IN_MS,
 	});
 };
 
@@ -41,7 +41,7 @@ const setRefreshTokenCookie = (res: Response, token: string) => {
 		sameSite: "none",
 		path: "/",
 		// 7d
-		maxAge: SEVEN_DAYS,
+		maxAge: SEVEN_DAYS_IN_MS,
 	});
 };
 
@@ -52,7 +52,7 @@ const setBetterAuthSessionCookie = (res: Response, token: string) => {
 		sameSite: "none",
 		path: "/",
 		// 1d
-		maxAge: ONE_DAY,
+		maxAge: ONE_DAY_IN_MS,
 	});
 };
 

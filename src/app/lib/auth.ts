@@ -1,7 +1,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { UserRole, UserStatus } from "../../generated/prisma/enums";
-import { ONE_DAY } from "../utils/token";
 import { prisma } from "./prisma";
 
 export const auth = betterAuth({
@@ -43,11 +42,11 @@ export const auth = betterAuth({
 	},
 
 	session: {
-		expiresIn: ONE_DAY, // 1 day in MS
-		updateAge: ONE_DAY, // 1 day in MS
+		expiresIn: 60 * 60 * 24, // 1 day in second
+		updateAge: 60 * 60 * 24, // 1 day in second
 		cookieCache: {
 			enabled: true,
-			maxAge: ONE_DAY, // 1 day in MS
+			maxAge: 60 * 60 * 24, // 1 day in second
 		},
 	},
 
