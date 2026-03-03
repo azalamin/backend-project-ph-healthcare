@@ -1,15 +1,11 @@
 import status from "http-status";
 import { UserStatus } from "../../../generated/prisma/enums";
 import AppError from "../../errorHelpers/AppError";
+import { IRequestUser } from "../../interfaces/requestUser.interface";
 import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
 import { tokenUtils } from "../../utils/token";
-
-interface IRegisterPatientPayload {
-	name: string;
-	email: string;
-	password: string;
-}
+import { ILoginUserPayload, IRegisterPatientPayload } from "./auth.interface";
 
 const registerPatient = async (payload: IRegisterPatientPayload) => {
 	const { name, email, password } = payload;
@@ -75,11 +71,6 @@ const registerPatient = async (payload: IRegisterPatientPayload) => {
 	}
 };
 
-interface ILoginUserPayload {
-	email: string;
-	password: string;
-}
-
 const loginUser = async (payload: ILoginUserPayload) => {
 	const { email, password } = payload;
 
@@ -127,7 +118,42 @@ const loginUser = async (payload: ILoginUserPayload) => {
 	};
 };
 
+const getMe = async (user: IRequestUser) => {
+	const isUserExists = await prisma.user.findUnique({
+		where: {
+			id: user.userId,
+		},
+		include: {
+			patient: {
+				include: {
+					appointments: true,
+					reviews: true,
+					prescriptions: true,
+					medicalReports: true,
+					patientHealthData: true,
+				},
+			},
+			doctor: {
+				include: {
+					specialties: true,
+					appointments: true,
+					reviews: true,
+					prescriptions: true,
+				},
+			},
+			admins: true,
+		},
+	});
+
+	if (!isUserExists) {
+		throw new AppError(status.NOT_FOUND, "User not found");
+	}
+
+	return isUserExists;
+};
+
 export const AuthService = {
 	registerPatient,
 	loginUser,
+	getMe,
 };

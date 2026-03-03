@@ -64,7 +64,11 @@ export const checkAuth = (...authRoles: UserRole[]) => {
 						);
 					}
 
-					return next();
+					req.user = {
+						userId: user.id,
+						role: user.role,
+						email: user.email,
+					};
 				}
 
 				const accessToken = CookieUtils.getCookie(req, "accessToken");
@@ -87,10 +91,10 @@ export const checkAuth = (...authRoles: UserRole[]) => {
 				throw new AppError(status.UNAUTHORIZED, "Unauthorized access! Invalid access token.");
 			}
 
-			if (verifiedToken.data!.role !== UserRole.ADMIN) {
+			if (authRoles.length > 0 && !authRoles.includes(verifiedToken.data!.role as UserRole)) {
 				throw new AppError(
 					status.FORBIDDEN,
-					"Forbidden access! You do not have permission to access this resource",
+					"Forbidden access! You do not have permission to access this resource.",
 				);
 			}
 
