@@ -8,7 +8,11 @@ import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
 import { jwtUtils } from "../../utils/jwt";
 import { tokenUtils } from "../../utils/token";
-import { ILoginUserPayload, IRegisterPatientPayload } from "./auth.interface";
+import {
+	IChangePasswordPayload,
+	ILoginUserPayload,
+	IRegisterPatientPayload,
+} from "./auth.interface";
 
 const registerPatient = async (payload: IRegisterPatientPayload) => {
 	const { name, email, password } = payload;
@@ -215,9 +219,37 @@ const getNewToken = async (refreshToken: string, sessionToken: string) => {
 	};
 };
 
+const changePassword = async (payload: IChangePasswordPayload, sessionToken: string) => {
+	const session = await auth.api.getSession({
+		headers: new Headers({
+			Authorization: `Bearer ${sessionToken}`,
+		}),
+	});
+
+	if (!session) {
+		throw new AppError(status.UNAUTHORIZED, "Invalid session token");
+	}
+
+	const { currentPassword, newPassword } = payload;
+
+	const result = await auth.api.changePassword({
+		body: {
+			currentPassword,
+			newPassword,
+			revokeOtherSessions: true,
+		},
+		headers: new Headers({
+			Authorization: `Bearer ${sessionToken}`,
+		}),
+	});
+
+	return result;
+};
+
 export const AuthService = {
 	registerPatient,
 	loginUser,
 	getMe,
 	getNewToken,
+	changePassword,
 };
