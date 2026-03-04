@@ -243,6 +243,17 @@ const changePassword = async (payload: IChangePasswordPayload, sessionToken: str
 		}),
 	});
 
+	if (session.user.needsPasswordChange) {
+		await prisma.user.update({
+			where: {
+				id: session.user.id,
+			},
+			data: {
+				needsPasswordChange: false,
+			},
+		});
+	}
+
 	const accessToken = tokenUtils.getAccessToken({
 		userId: session.user.id,
 		role: session.user.role,
