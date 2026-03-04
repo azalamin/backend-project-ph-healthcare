@@ -243,6 +243,40 @@ const changePassword = async (payload: IChangePasswordPayload, sessionToken: str
 		}),
 	});
 
+	const accessToken = tokenUtils.getAccessToken({
+		userId: session.user.id,
+		role: session.user.role,
+		name: session.user.name,
+		email: session.user.email,
+		status: session.user.status,
+		isDeleted: session.user.isDeleted,
+		emailVerified: session.user.emailVerified,
+	});
+
+	const refreshToken = tokenUtils.getRefreshToken({
+		userId: session.user.id,
+		role: session.user.role,
+		name: session.user.name,
+		email: session.user.email,
+		status: session.user.status,
+		isDeleted: session.user.isDeleted,
+		emailVerified: session.user.emailVerified,
+	});
+
+	return {
+		...result,
+		accessToken,
+		refreshToken,
+	};
+};
+
+const logoutUser = async (sessionToken: string) => {
+	const result = await auth.api.signOut({
+		headers: new Headers({
+			Authorization: `Bearer ${sessionToken}`,
+		}),
+	});
+
 	return result;
 };
 
@@ -252,4 +286,5 @@ export const AuthService = {
 	getMe,
 	getNewToken,
 	changePassword,
+	logoutUser,
 };
