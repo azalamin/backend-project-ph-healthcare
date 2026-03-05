@@ -10,6 +10,7 @@ import { jwtUtils } from "../../utils/jwt";
 import { tokenUtils } from "../../utils/token";
 import {
 	IChangePasswordPayload,
+	IGoogleLoginSuccessResult,
 	ILoginUserPayload,
 	IRegisterPatientPayload,
 } from "./auth.interface";
@@ -364,11 +365,57 @@ const resetPassword = async (email: string, otp: string, newPassword: string) =>
 		},
 	});
 
+	if (isUserExists.needsPasswordChange) {
+		await prisma.user.update({
+			where: {
+				id: isUserExists.id,
+			},
+			data: {
+				needsPasswordChange: false,
+			},
+		});
+	}
+
 	await prisma.session.deleteMany({
 		where: {
 			userId: isUserExists.id,
 		},
 	});
+};
+
+const googleLoginSuccess = async (session: IGoogleLoginSuccessResult) => {
+	const isPatientExists = await prisma.patient.findUnique({
+		where: {
+			userId: session.user.id,
+		},
+	});
+
+	if (!isPatientExists) {
+		await prisma.patient.create({
+			data: {
+				userId: session.user.id,
+				name: session.user.name,
+				email: session.user.email,
+			},
+		});
+	}
+
+	const accessToken = tokenUtils.getAccessToken({
+		userId: session.user.id,
+		role: session.user.role,
+		name: session.user.name,
+	});
+
+	const refreshToken = tokenUtils.getRefreshToken({
+		userId: session.user.id,
+		role: session.user.role,
+		name: session.user.name,
+	});
+
+	return {
+		accessToken,
+		refreshToken,
+	};
 };
 
 export const AuthService = {
@@ -381,4 +428,5 @@ export const AuthService = {
 	verifyEmail,
 	forgetPassword,
 	resetPassword,
+	googleLoginSuccess,
 };
