@@ -17,6 +17,7 @@ const storage = new CloudinaryStorage({
 			.replace(/[^a-z0-9\-]/g, "");
 		const uniqueName =
 			Math.random().toString(36).substring(2) + "-" + Date.now() + "-" + fileNameWithoutExt;
+		console.log({ uniqueName });
 
 		const folder = extension === "pdf" ? "pdfs" : "images";
 

@@ -30,12 +30,12 @@ app.use(
 
 app.use("/api/auth", toNodeHandler(auth));
 
-// Enable URL-encoded form data parsing
-app.use(express.urlencoded({ extended: true }));
-
 // Middleware to parse JSON bodies
 app.use(express.json());
 app.use(cookieParser());
+
+// Enable URL-encoded form data parsing
+app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1", IndexRoutes);
 
